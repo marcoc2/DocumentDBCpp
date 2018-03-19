@@ -101,9 +101,9 @@ namespace documentdb {
 		std::shared_ptr<Document> GetDocument(
 			const utility::string_t& resource_id) const;
 
-		pplx::task<std::vector<std::shared_ptr<Document>>> ListDocumentsAsync() const;
+                pplx::task<std::vector<std::shared_ptr<Document>>> ListDocumentsAsync(int n_items = 100) const;
 
-		std::vector<std::shared_ptr<Document>> ListDocuments() const;
+                std::vector<std::shared_ptr<Document>> ListDocuments(int n_items = 100) const;
 
 		pplx::task<std::shared_ptr<Document>> ReplaceDocumentAsync(
 			const utility::string_t& resource_id,

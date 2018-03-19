@@ -297,7 +297,7 @@ shared_ptr<Document> Collection::GetDocument(
 	return this->GetDocumentAsync(resource_id).get();
 }
 
-pplx::task<vector<shared_ptr<Document>>> Collection::ListDocumentsAsync() const
+pplx::task<vector<shared_ptr<Document>>> Collection::ListDocumentsAsync(int n_items) const
 {
 	http_request request = CreateRequest(
 		methods::GET,
@@ -305,6 +305,9 @@ pplx::task<vector<shared_ptr<Document>>> Collection::ListDocumentsAsync() const
 		this->resource_id(),
 		this->document_db_configuration()->master_key());
 	request.set_request_uri(this->self() + docs_);
+    request.headers().add(web::http::header_names::content_type, MIME_TYPE_APPLICATION_SQL);
+    request.headers().add(HEADER_MS_DOCUMENTDB_IS_QUERY, true);
+    request.headers().add(HEADER_MS_MAX_ITEM_COUNT, n_items);
 	return this->document_db_configuration()->http_client().request(request).then([=](http_response response)
 	{
 		value json_response = response.extract_json().get();
@@ -328,9 +331,9 @@ pplx::task<vector<shared_ptr<Document>>> Collection::ListDocumentsAsync() const
 	});
 }
 
-vector<shared_ptr<Document>> Collection::ListDocuments() const
+vector<shared_ptr<Document>> Collection::ListDocuments(int n_items) const
 {
-	return this->ListDocumentsAsync().get();
+    return this->ListDocumentsAsync(n_items).get();
 }
 
 pplx::task<shared_ptr<Document>> Collection::ReplaceDocumentAsync(
